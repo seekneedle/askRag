@@ -13,7 +13,8 @@ async function handleRequest(request) {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, access-control-allow-origin',
+    'Access-Control-Expose-Headers': '*'
   }
 
   // Handle OPTIONS request for CORS
