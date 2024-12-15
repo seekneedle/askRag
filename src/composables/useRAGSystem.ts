@@ -5,8 +5,8 @@ import { AudioQueueManager } from './AudioQueueManager';
 import { extractJsonObjects } from '../utils/utils';
 import { config } from '../config/config';
 
-const STREAM_QUERY_URL = 'vector_store/stream_query';
-const QUERY_URL = 'vector_store/query';
+const STREAM_QUERY_URL = `${config.api.baseUrl}/vector_store/stream_query`;
+const QUERY_URL = `${config.api.baseUrl}/vector_store/query`;
 
 //let authToken = ref<string | null>(null);
 let seenBytes = 0;

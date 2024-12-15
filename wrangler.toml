@@ -1,0 +1,6 @@
+name = "askrag-proxy"
+main = "proxy-worker.js"
+compatibility_date = "2023-12-01"
+
+[vars]
+BACKEND_URL = "http://8.152.213.191:8471"
