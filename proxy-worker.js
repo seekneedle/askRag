@@ -3,18 +3,15 @@ addEventListener('fetch', event => {
 })
 
 async function handleRequest(request) {
-  // Configure your backend API URL
+  // Configure your backend API URL from environment variable
   const BACKEND_URL = 'http://8.152.213.191:8471'
 
-  // Clone the request headers
-  const headers = new Headers(request.headers)
-  
   // Add CORS headers
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, access-control-allow-origin',
-    'Access-Control-Expose-Headers': '*'
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, access-control-allow-origin, X-Requested-With',
+    'Access-Control-Max-Age': '86400',
   }
 
   // Handle OPTIONS request for CORS
@@ -27,15 +24,29 @@ async function handleRequest(request) {
   try {
     // Forward the request to your backend
     const url = new URL(request.url)
-    const backendRequest = new Request(BACKEND_URL + url.pathname, {
+    const backendUrl = new URL(url.pathname, BACKEND_URL)
+    
+    // Create new headers
+    const newHeaders = new Headers()
+    for (const [key, value] of request.headers) {
+      // Skip host header
+      if (key.toLowerCase() === 'host') continue
+      newHeaders.set(key, value)
+    }
+    
+    // Add custom headers if needed
+    newHeaders.set('Host', new URL(BACKEND_URL).host)
+    
+    const backendRequest = new Request(backendUrl.toString(), {
       method: request.method,
-      headers: headers,
-      body: request.body
+      headers: newHeaders,
+      body: request.body,
+      redirect: 'follow'
     })
 
     const response = await fetch(backendRequest)
     
-    // Clone the response and add CORS headers
+    // Create response headers
     const responseHeaders = new Headers(response.headers)
     Object.keys(corsHeaders).forEach(key => {
       responseHeaders.set(key, corsHeaders[key])
@@ -47,7 +58,7 @@ async function handleRequest(request) {
       headers: responseHeaders
     })
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Proxy error' }), {
+    return new Response(JSON.stringify({ error: 'Proxy error', details: error.message }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
