@@ -1,0 +1,57 @@
+import { ref } from 'vue';
+import { BailianService } from '../services/bailianService';
+
+export function useRAGSystem() {
+  const isLoading = ref(false);
+  const messages = ref([
+    {
+      role: 'assistant',
+      content: 'Hello Boss! How can I assist you today?'
+    }
+  ]);
+
+  const bailianService = new BailianService();
+
+  const getResponse = async (question) => {
+    try {
+      console.log('Starting to get response for question:', question);
+      isLoading.value = true;
+      messages.value.push({
+        role: 'user',
+        content: question
+      });
+
+      const knowledgeNodes = await bailianService.retrieve(question);
+      console.log('Retrieved knowledge nodes:', knowledgeNodes);
+      const documents = knowledgeNodes.join('｜');
+
+      const chatMessages = messages.value.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      const response = await bailianService.getChatResponse(chatMessages, documents);
+      console.log('Received chat response:', response);
+      
+      messages.value.push({
+        role: 'assistant',
+        content: response
+      });
+    } catch (error) {
+      console.error('Error getting response:', error);
+      messages.value.push({
+        role: 'assistant',
+        content: "I apologize, Boss, but I encountered an error processing your request. Please try again later."
+      });
+    } finally {
+      isLoading.value = false;
+      console.log('Loading state set to false');
+    }
+  };
+
+  return {
+    messages,
+    isLoading,
+    getResponse
+  };
+}
