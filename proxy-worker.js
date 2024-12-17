@@ -3,18 +3,15 @@ addEventListener('fetch', event => {
 })
 
 async function handleRequest(request) {
-  // Configure your backend API URL from environment variable
-  const BACKEND_URL = 'http://8.152.213.191:8471'
+  const BACKEND_URL = 'http://tech.surewiser.com:8471'
 
-  // Add CORS headers
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, access-control-allow-origin, X-Requested-With',
+    'Access-Control-Allow-Headers': '*',
     'Access-Control-Max-Age': '86400',
   }
 
-  // Handle OPTIONS request for CORS
   if (request.method === 'OPTIONS') {
     return new Response(null, {
       headers: corsHeaders
@@ -22,43 +19,79 @@ async function handleRequest(request) {
   }
 
   try {
-    // Forward the request to your backend
     const url = new URL(request.url)
-    const backendUrl = new URL(url.pathname, BACKEND_URL)
-    
-    // Create new headers
-    const newHeaders = new Headers()
-    for (const [key, value] of request.headers) {
-      // Skip host header
-      if (key.toLowerCase() === 'host') continue
-      newHeaders.set(key, value)
+    const path = url.pathname.replace(/\/+/g, '/')
+    const backendUrl = `${BACKEND_URL}${path}${url.search}`
+
+    console.log('Attempting to fetch:', backendUrl)
+
+    let requestBody = null
+    if (request.body) {
+      const bodyText = await request.text()
+      requestBody = bodyText
+      console.log('Request body:', requestBody)
     }
-    
-    // Add custom headers if needed
-    newHeaders.set('Host', new URL(BACKEND_URL).host)
-    
-    const backendRequest = new Request(backendUrl.toString(), {
+
+    // Use the exact same fetch options that worked locally
+    const fetchOptions = {
       method: request.method,
-      headers: newHeaders,
-      body: request.body,
-      redirect: 'follow'
-    })
+      headers: {
+        'Authorization': 'Basic bmVlZGxlOm5lZWRsZQ==',
+        'Content-Type': 'application/json',
+        'Accept': '*/*'
+      },
+      body: requestBody,
+      redirect: 'follow',
+      cf: {
+        cacheTtl: 0,
+        cacheEverything: false,
+        scrapeShield: false,
+        apps: false,
+        resolveOverride: '8.152.213.191',
+        noResolve: true,
+        tlsVersion: "none"  // Allow HTTP
+      }
+    }
 
-    const response = await fetch(backendRequest)
-    
-    // Create response headers
-    const responseHeaders = new Headers(response.headers)
-    Object.keys(corsHeaders).forEach(key => {
-      responseHeaders.set(key, corsHeaders[key])
-    })
+    console.log('Fetch options:', JSON.stringify(fetchOptions, null, 2))
 
-    return new Response(response.body, {
+    const response = await fetch(backendUrl, fetchOptions)
+    console.log('Response status:', response.status)
+
+    if (path.includes('stream_query')) {
+      const { readable, writable } = new TransformStream()
+      response.body.pipeTo(writable).catch(error => {
+        console.error('Stream error:', error)
+      })
+      
+      return new Response(readable, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          ...corsHeaders
+        }
+      })
+    }
+
+    const responseBody = await response.text()
+    console.log('Response body:', responseBody)
+
+    return new Response(responseBody, {
       status: response.status,
-      statusText: response.statusText,
-      headers: responseHeaders
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
     })
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Proxy error', details: error.message }), {
+    console.error('Worker error:', error)
+    return new Response(JSON.stringify({
+      error: 'Proxy error',
+      message: error.message,
+      stack: error.stack,
+      url: BACKEND_URL
+    }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',

@@ -5,7 +5,7 @@ const API_CONFIG = {
         baseUrl: '', // Empty for relative URLs that will be handled by Vite proxy
     },
     production: {
-        baseUrl: 'https://askrag-proxy.wulfgang.workers.dev', // Replace with your Cloudflare Worker URL
+        baseUrl: 'http://8.152.213.191:8471', // Direct backend URL in production
     }
 };
 
