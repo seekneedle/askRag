@@ -9,7 +9,7 @@ const language = "cn";
 const voice_type = "BV700_V2_streaming";//"BV704_streaming"//
 const emotion = "professional";
 const host = "openspeech.bytedance.com";
-const api_url = `https://${host}/api/v1/tts`;
+const api_url = `https://cors-anywhere.herokuapp.com/https://${host}/api/v1/tts`;
 
 const header = {
     "Authorization": `Bearer;${access_token}`
