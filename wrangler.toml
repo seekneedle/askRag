@@ -2,5 +2,8 @@ name = "askrag-proxy"
 main = "proxy-worker.js"
 compatibility_date = "2023-12-01"
 
+[observability.logs]
+enabled = true
+
 [vars]
 BACKEND_URL = "https://openspeech.bytedance.com"
