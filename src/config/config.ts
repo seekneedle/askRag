@@ -5,7 +5,7 @@ const API_CONFIG = {
         baseUrl: '', // Empty for relative URLs that will be handled by Vite proxy
     },
     production: {
-        baseUrl: 'https://8.152.213.191:8471', // Direct backend URL in production
+        baseUrl: 'https://kb.uuxlink.com'//'https://8.152.213.191:8471', // Direct backend URL in production
     }
 };
 
