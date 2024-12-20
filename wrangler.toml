@@ -3,4 +3,4 @@ main = "proxy-worker.js"
 compatibility_date = "2023-12-01"
 
 [vars]
-BACKEND_URL = "http://tech.surewiser.com:8471"
+BACKEND_URL = "https://openspeech.bytedance.com"

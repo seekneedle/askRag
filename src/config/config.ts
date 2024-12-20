@@ -7,7 +7,7 @@ const API_CONFIG = {
     },
     production: {
         baseUrl: 'https://kb.uuxlink.com', //'https://8.152.213.191:8471', // Direct backend URL in production
-        ttsBaseUrl: 'https://openspeech.bytedance.com'
+        ttsBaseUrl: 'https://askrag-proxy.wulfgang.workers.dev'//'https://openspeech.bytedance.com'
     }
 };
 
