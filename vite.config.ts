@@ -54,12 +54,12 @@ export default defineConfig({
         }
       },
       '/vector_store/query': {
-        target: 'http://8.152.213.191:8471',
+        target: 'https://kb.uuxlink.com',
         changeOrigin: true
       },
 
       '/vector_store/stream_query': {
-        target: 'http://8.152.213.191:8471',
+        target: 'https://kb.uuxlink.com',
         changeOrigin: true
       },
       '/api/v1/tts': {

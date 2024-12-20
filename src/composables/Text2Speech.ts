@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-
+import { config } from '../config/config';
 // 设置API密钥
 const appid = "4823798285";
 const access_token = "GmakIY6Um9DZgCQl7Rr0RJNfDukCJ8RB";
@@ -8,8 +8,7 @@ const cluster = "volcano_tts";
 const language = "cn";
 const voice_type = "BV700_V2_streaming";//"BV704_streaming"//
 const emotion = "professional";
-const host = "openspeech.bytedance.com";
-const api_url = `https://cors-anywhere.herokuapp.com/https://${host}/api/v1/tts`;
+const api_url = `${config.api.ttsBaseUrl}/api/v1/tts`;
 
 const header = {
     "Authorization": `Bearer;${access_token}`
